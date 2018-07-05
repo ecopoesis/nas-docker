@@ -1,0 +1,85 @@
+version: '2'
+services:
+  plex:
+    image: plexinc/pms-docker
+    container_name: plex
+    network_mode: host
+    restart: unless-stopped
+    environment:
+     - TZ="America/New_York"
+    volumes:
+     - /share/Configuration/plex:/config
+     - /share/Transcode:/transcode
+     - /share/Media:/data
+  sabnzbd:
+    image: linuxserver/sabnzbd
+    container_name: sabnzbd
+    ports:
+     - 10000:8080
+     - 10001:9090
+    environment:
+     - TZ="America/New_York"
+     - PGID=100
+     - PUID=500
+    volumes:
+     - /share/Configuration/sabnzbd:/config
+     - /share/Media/sabnzbd/complete:/downloads
+     - /share/Media/sabnzbd/incomplete:/incomplete-downloads
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    ports:
+     - 10004:8989
+    environment:
+     - TZ="America/New_York"
+     - PGID=100
+     - PUID=500
+    volumes:
+     - /dev/rtc:/dev/rtc:ro
+     - /share/Configuration/sonarr:/config
+     - /share/Media/sabnzbd/complete:/downloads
+     - /share/Media/tv:/tv
+    links:
+     - sabnzbd
+     - plex
+     - deluge
+  radarr:
+    image: linuxserver/radarr
+    container_name: radarr
+    ports:
+     - 10002:7878
+    environment:
+     - TZ="America/New_York"
+     - PGID=100
+     - PUID=500
+    volumes:
+     - /share/Configuration/radarr:/config
+     - /share/Media/sabnzbd/complete:/downloads
+     - /share/Media/movies:/movies
+    links:
+     - sabnzbd
+     - plex
+  deluge: 
+    image: linuxserver/deluge
+    container_name: deluge
+    network_mode: host
+    environment:
+     - TZ="America/New_York"
+     - PGID=100
+     - PUID=500
+    volumes:
+     - /share/Configuration/deluge:/config
+     - /share/Media/sabnzbd/complete:/downloads
+  channels-dvr:
+    image: fancybits/channels-dvr:latest
+    container_name: channels-dvr
+    network_mode: host
+    ports:
+      - "8089:8089"
+    restart: unless-stopped
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - /share/Configuration/channels-dvr:/channels-dvr
+      - /share/Media/recordings:/shares/DVR
+
