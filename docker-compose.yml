@@ -14,6 +14,7 @@ services:
   sabnzbd:
     image: linuxserver/sabnzbd
     container_name: sabnzbd
+    restart: unless-stopped
     ports:
      - 10000:8080
      - 10001:9090
@@ -28,6 +29,7 @@ services:
   sonarr:
     image: linuxserver/sonarr
     container_name: sonarr
+    restart: unless-stopped
     ports:
      - 10004:8989
     environment:
@@ -45,6 +47,7 @@ services:
      - deluge
   radarr:
     image: linuxserver/radarr
+    restart: unless-stopped
     container_name: radarr
     ports:
      - 10002:7878
@@ -63,6 +66,7 @@ services:
     image: linuxserver/deluge
     container_name: deluge
     network_mode: host
+    restart: unless-stopped
     environment:
      - TZ="America/New_York"
      - PGID=100
@@ -73,13 +77,18 @@ services:
   channels-dvr:
     image: fancybits/channels-dvr:latest
     container_name: channels-dvr
+    restart: unless-stopped
     network_mode: host
     ports:
       - "8089:8089"
-    restart: unless-stopped
     devices:
       - /dev/dri:/dev/dri
     volumes:
       - /share/Configuration/channels-dvr:/channels-dvr
       - /share/Media/recordings:/shares/DVR
-
+networks:
+  default:
+    ipam:
+      config:
+       - subnet: 10.0.47.0/24
+         gateway: 10.0.47.1
