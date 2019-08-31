@@ -86,18 +86,14 @@ services:
     volumes:
       - /share/Configuration/channels-dvr:/channels-dvr
       - /share/Media/recordings:/shares/DVR
-  home-assistant:
-    image: homeassistant/home-assistant
-    container_name: home-assistant
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
     restart: unless-stopped
     network_mode: host
-    ports:
-      - "8123:8123"
-    environment:
-      - TZ="America/New_York"
     volumes:
-      - /share/Configuration/home-assistant:/config
-      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --schedule "0 0 3 * * *" --debug
 networks:
   default:
     ipam:
