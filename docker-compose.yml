@@ -11,6 +11,8 @@ services:
      - /share/Configuration/plex:/config
      - /share/Transcode:/transcode
      - /share/Media:/data
+    devices:
+     - /dev/dri:/dev/dri
   sabnzbd:
     image: linuxserver/sabnzbd
     container_name: sabnzbd
