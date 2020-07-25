@@ -107,13 +107,23 @@ services:
     restart: always
     network_mode: host
     environment:
-      - TZ=Australia/Sydney
-      - PGID=1000
-      - PUID=1000
+      - TZ="America/New_York"
+      - PGID=100
+      - PUID=500
       - HOMEBRIDGE_CONFIG_UI=1
       - HOMEBRIDGE_CONFIG_UI_PORT=1701
     volumes:
       - /share/Configuration/homebridge:/homebridge
+  ddclient:
+    image: linuxserver/ddclient
+    container_name: ddclient
+    environment:
+      - PGID=100
+      - PUID=500
+      - TZ="America/New_York"
+    volumes:
+      - /share/Configuration/ddclient:/config
+    restart: unless-stopped
 networks:
   default:
     ipam:
