@@ -124,6 +124,20 @@ services:
     volumes:
       - /share/Configuration/ddclient:/config
     restart: unless-stopped
+  pyload:
+    image: linuxserver/pyload
+    container_name: pyload
+    environment:
+      - PGID=100
+      - PUID=500
+      - TZ="America/New_York"
+    volumes:
+      - /share/Configuration/pyload:/config
+      - /share/Media/sabnzbd/complete:/downloads
+    ports:
+      - 8000:8000
+      - 7227:7227
+    restart: unless-stopped
 networks:
   default:
     ipam:
