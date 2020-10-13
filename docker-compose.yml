@@ -138,6 +138,23 @@ services:
       - 8000:8000
       - 7227:7227
     restart: unless-stopped
+  openhab:
+    image: openhab/openhab
+    container_name: openhab
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /share/Configuration/openhab/timezone:/etc/timezone:ro
+      - /share/Configuration/openhab/addons:/openhab/addons
+      - /share/Configuration/openhab/conf:/openhab/conf
+      - /share/Configuration/openhab/userdata:/openhab/userdata
+    environment:
+      OPENHAB_HTTP_PORT: "12080"
+      OPENHAB_HTTPS_PORT: "12443"
+      EXTRA_JAVA_OPTS: "-Duser.timezone=America/New_York"
+      GROUP_ID: 100
+      USER_ID: 500
 networks:
   default:
     ipam:
