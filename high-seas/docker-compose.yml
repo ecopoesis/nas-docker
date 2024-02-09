@@ -1,0 +1,84 @@
+version: '3'
+services:
+  plex:
+    image: linuxserver/plex
+    container_name: plex
+    network_mode: host
+    restart: unless-stopped
+    environment:
+     - TZ="America/New_York"
+     - VERSION=docker
+     - PGID=100
+     - PUID=500
+    volumes:
+     - /share/homes/containers/plex:/config
+     - /share/homes/media:/data
+     - /share/homes/media/transcode:/transcode
+    devices:
+     - /dev/dri:/dev/dri
+    privileged: true
+  sabnzbd:
+    image: linuxserver/sabnzbd
+    container_name: sabnzbd
+    restart: unless-stopped
+    ports:
+     - 10000:8080
+     - 10001:9090
+    environment:
+     - TZ="America/New_York"
+     - PGID=100
+     - PUID=500
+    volumes:
+     - /share/homes/containers/sabnzbd:/config
+     - /share/homes/media/downloads/sabnzbd-complete:/downloads
+     - /share/homes/media/downloads/sabnzdb-incomplete:/incomplete-downloads
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    restart: unless-stopped
+    ports:
+      - 10004:8989
+    environment:
+      - TZ="America/New_York"
+      - PGID=100
+      - PUID=500
+    volumes:
+      - /dev/rtc:/dev/rtc:ro
+      - /share/homes/containers/sonarr:/config
+      - /share/homes/media/downloads/sonarr:/downloads
+      - /share/homes/media/tv:/tv
+    links:
+      - sabnzbd
+      - plex
+      - deluge
+  radarr:
+    image: linuxserver/radarr
+    restart: unless-stopped
+    container_name: radarr
+    ports:
+      - "10002:7878"
+    environment:
+      - TZ="America/New_York"
+      - PGID=100
+      - PUID=500
+    volumes:
+      - /share/homes/containers/radarr:/config
+      - /share/homes/media/downloads/radarr:/downloads
+      - /share/homes/media/movies:/movies
+    links:
+      - sabnzbd
+      - plex
+      - deluge
+  deluge:
+    image: linuxserver/deluge
+    container_name: deluge
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      - TZ="America/New_York"
+      - PGID=100
+      - PUID=500
+    volumes:
+      - /share/homes/containers/deluge:/config
+      - /share/homes/media/downloads/deluge:/downloads
+
