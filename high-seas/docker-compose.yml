@@ -86,6 +86,7 @@ services:
       - /share/homes/media/downloads/deluge:/downloads
   resilio_sync:
     image: resilio/sync
+    container_name: resilio
     restart: always
     ports:
      - 10006:8888
