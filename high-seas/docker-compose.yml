@@ -92,6 +92,9 @@ services:
      - 10006:8888
      - 55555:55555/tcp
      - 55555:55555/udp     
+    environment:
+     - PGID=1000
+     - PUID=500
     volumes:
      - /share/homes/containers/resilio_sync/storage:/mnt/sync/storage     
      - /share/homes/containers/resilio_sync/config/sync.conf:/mnt/sync/sync.conf   
