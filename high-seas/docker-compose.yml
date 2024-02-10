@@ -8,7 +8,7 @@ services:
     environment:
      - TZ="America/New_York"
      - VERSION=docker
-     - PGID=100
+     - PGID=1000
      - PUID=500
     volumes:
      - /share/homes/containers/plex:/config
@@ -26,7 +26,7 @@ services:
      - 10001:9090
     environment:
      - TZ="America/New_York"
-     - PGID=100
+     - PGID=1000
      - PUID=500
     volumes:
      - /share/homes/containers/sabnzbd:/config
@@ -40,7 +40,7 @@ services:
       - 10004:8989
     environment:
       - TZ="America/New_York"
-      - PGID=100
+      - PGID=1000
       - PUID=500
     volumes:
       - /dev/rtc:/dev/rtc:ro
@@ -60,7 +60,7 @@ services:
       - "10002:7878"
     environment:
       - TZ="America/New_York"
-      - PGID=100
+      - PGID=1000
       - PUID=500
     volumes:
       - /share/homes/containers/radarr:/config
@@ -78,7 +78,7 @@ services:
     restart: unless-stopped
     environment:
       - TZ="America/New_York"
-      - PGID=100
+      - PGID=1000
       - PUID=500
     volumes:
       - /share/homes/containers/deluge:/config
