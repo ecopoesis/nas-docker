@@ -66,6 +66,7 @@ services:
       - /share/homes/containers/radarr:/config
       - /share/homes/media/downloads/complete:/downloads
       - /share/homes/media/downloads/incomplete:/incomplete-downloads
+      - /share/homes/media/downloads/resilio:/downloads-resilio
       - /share/homes/media/movies:/movies
     links:
       - sabnzbd
@@ -83,4 +84,14 @@ services:
     volumes:
       - /share/homes/containers/deluge:/config
       - /share/homes/media/downloads/deluge:/downloads
-
+  resilio_sync:
+    image: resilio/sync
+    restart: always
+    ports:
+     - 10006:8888
+     - 55555:55555/tcp
+     - 55555:55555/udp     
+    volumes:
+     - /share/homes/containers/resilio_sync/storage:/mnt/sync/storage     
+     - /share/homes/containers/resilio_sync/config/sync.conf:/mnt/sync/sync.conf   
+     - /share/homes/media/downloads/resilio:/mnt/sync/data 
