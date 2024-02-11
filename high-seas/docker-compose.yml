@@ -87,6 +87,10 @@ services:
   resilio-sync:
     image: resilio/sync
     container_name: resilio
+    ports:
+      - 55555/tcp
+      - 55555/udp
+      - "10006:8888"
     volumes:
       - /path/to/resilio/folder/on/host:/mnt/sync
     restart: always
