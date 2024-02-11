@@ -105,4 +105,4 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - TZ="America/New_York"   
-    command: plex sabnzbd sonarr radarr deluge resilio-sync --cleanup --schedule "0 0 4 1/1 * ? *"
+    command: plex sabnzbd sonarr radarr deluge resilio-sync --cleanup --schedule "0 0 4 * * *"
