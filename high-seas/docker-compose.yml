@@ -93,18 +93,3 @@ services:
     user: "500:1000"
     environment:
       - TZ="America/New_York"
-  resilio_sync:
-    image: lscr.io/linuxserver/resilio-sync:latest
-    container_name: resilio
-    restart: always
-    ports:
-     - 10006:8888
-     - 55555:55555/tcp
-     - 55555:55555/udp     
-    environment:
-     - TZ="America/New_York"
-     - PGID=1000
-     - PUID=500
-    volumes:
-     - /share/homes/containers/resilio_sync:/mnt/sync    
-     - /etc/localtime:/etc/localtime:ro
