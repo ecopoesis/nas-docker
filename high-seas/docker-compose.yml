@@ -98,3 +98,11 @@ services:
     user: "500:1000"
     environment:
       - TZ="America/New_York"
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ="America/New_York"   
+    command: plex sabnzbd sonarr radarr deluge resilio-sync --cleanup --schedule "0 0 4 1/1 * ? *"
