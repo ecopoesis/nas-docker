@@ -84,6 +84,15 @@ services:
     volumes:
       - /share/homes/containers/deluge:/config
       - /share/homes/media/downloads/deluge:/downloads
+  resilio-sync:
+    image: resilio/sync
+    container_name: resilio
+    volumes:
+      - /path/to/resilio/folder/on/host:/mnt/sync
+    restart: always
+    user: "500:1000"
+    environment:
+      - TZ="America/New_York"
   resilio_sync:
     image: lscr.io/linuxserver/resilio-sync:latest
     container_name: resilio
@@ -97,6 +106,5 @@ services:
      - PGID=1000
      - PUID=500
     volumes:
-     - /share/homes/containers/resilio_sync/storage:/sync    
-     - /share/homes/containers/resilio_sync/config:/config  
-     - /share/homes/media/downloads/resilio:/downloads
+     - /share/homes/containers/resilio_sync:/mnt/sync    
+     - /etc/localtime:/etc/localtime:ro
