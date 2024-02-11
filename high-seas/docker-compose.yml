@@ -92,7 +92,8 @@ services:
       - 55555/udp
       - "10006:8888"
     volumes:
-      - /path/to/resilio/folder/on/host:/mnt/sync
+      - /share/homes/containers/resilio_sync:/mnt/sync
+      - /share/homes/media/downloads/resilio:/mnt/mounted_folders/downloads
     restart: always
     user: "500:1000"
     environment:
