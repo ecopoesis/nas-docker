@@ -103,6 +103,7 @@ services:
     container_name: watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
     environment:
       - TZ="America/New_York"   
     command: plex sabnzbd sonarr radarr deluge resilio-sync --cleanup --schedule "0 0 4 * * *"
