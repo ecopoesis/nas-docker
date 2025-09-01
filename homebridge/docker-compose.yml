@@ -20,7 +20,8 @@ networks:
   homekit_net:
     driver: macvlan
     driver_opts:
-      parent: eth1              
+      parent: eth1.16
+      macvlan_mode: bridge
     ipam:
       config:
         - subnet: 192.168.16.0/24
