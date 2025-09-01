@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  homebridge:
+    image: homebridge/homebridge:ubuntu
+    container_name: homebridge
+    networks:
+      homekit_net:
+        ipv4_address: 192.168.16.3   
+    environment:
+      - TZ=America/New_York
+      - HOMEBRIDGE_CONFIG_UI=1
+      - HOMEBRIDGE_CONFIG_UI_PORT=8581
+    volumes:
+      - /share/homes/containers/homebridge:/homebridge
+    restart: unless-stopped
+    # No ports section needed with macvlan (the container has its own IP)
+
+networks:
+  homekit_net:
+    driver: macvlan
+    driver_opts:
+      parent: eth1.16               
+    ipam:
+      config:
+        - subnet: 192.168.16.0/24
+          gateway: 192.168.16.1
