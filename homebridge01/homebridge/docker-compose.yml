@@ -11,6 +11,8 @@ services:
       - HOMEBRIDGE_CONFIG_UI_PORT=8581
     volumes:
       - /opt/containers/homebridge:/homebridge
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
     restart: unless-stopped
     logging:
       driver: json-file
