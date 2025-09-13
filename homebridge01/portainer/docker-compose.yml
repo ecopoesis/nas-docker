@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 9001:8000
+      - 9000:9000
+      - 9043:9443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /opt/containers/portainer:/data:rw
+    environment:
+      TZ: America/New_York
