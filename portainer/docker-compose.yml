@@ -1,18 +1,19 @@
-version: '3'
-
 services:
   portainer:
-    image: portainer/portainer-ce:latest
     container_name: portainer
+    image: portainer/portainer-ce:lts
     restart: always
-    security_opt:
-      - no-new-privileges:true
-    ports:
-      - 9001:8000
-      - 9000:9000
-      - 9043:9443
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /share/homes/containers/portainer-ce/data:/data:rw
-    environment:
-      TZ: America/New_York
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    ports:
+      - 9443:9443
+      - 8000:8000  # Remove if you do not intend to use Edge Agents
+
+volumes:
+  portainer_data:
+    name: portainer_data
+
+networks:
+  default:
+    name: portainer_network
