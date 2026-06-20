@@ -4,20 +4,22 @@ services:
     container_name: nut-upsd
     restart: always
     environment:
-      # The UPS / driver definition is supplied via the inline `ups_conf` config below
-      # (the image copies /etc/nut/local/ups.conf to /etc/nut/ups.conf on startup),
-      # because the GXT5 needs an explicit productid that this image's env config can't
-      # set. NAME must match the [section] in that config so the built-in upsmon
-      # monitors the right UPS.
+      # The UPS / driver definition lives in /opt/containers/nut/ups.conf (mounted
+      # below); the image copies it to /etc/nut/ups.conf on startup. It's a file because
+      # the GXT5 needs an explicit productid that this image's env config can't set.
+      # NAME must match the [section] in that file so the built-in upsmon monitors it.
       NAME: gxt5
       MAXAGE: "15"
       # --- monitor account used by every upsmon (this container + the hosts) ---
       API_USER: upsmon
       # Set NUT_PASSWORD in the Portainer stack's Environment variables (or a local .env).
       API_PASSWORD: ${NUT_PASSWORD:?set NUT_PASSWORD in the stack environment}
-    configs:
-      - source: ups_conf
-        target: /etc/nut/local/ups.conf
+    volumes:
+      # Pre-created host file (see nut/local/ups.conf in the repo). An absolute path to a
+      # real file avoids the two traps hit on this image: a read-only *directory* mount
+      # makes the image's chgrp abort, and a missing bind source makes Docker create the
+      # source as a directory. Portainer also does not render inline compose `configs`.
+      - /opt/containers/nut/ups.conf:/etc/nut/local/ups.conf:ro
     devices:
       # Whole USB bus: survives device renumbering across reboots.
       - /dev/bus/usb:/dev/bus/usb
@@ -30,17 +32,3 @@ services:
       options:
         max-size: "10mb"
         max-file: "1"
-
-configs:
-  ups_conf:
-    # Inlined (not a bind mount) so the stack is self-contained and Portainer's git
-    # deploy can't create the mount source as a directory. The GXT5 (10af:1000) is not
-    # auto-claimed by usbhid-ups — productid must be forced here.
-    content: |
-      [gxt5]
-          driver = usbhid-ups
-          port = auto
-          desc = "Vertiv GXT5 (server03)"
-          vendorid = 10af
-          productid = 1000
-          serial = "2431400101AFNC3"

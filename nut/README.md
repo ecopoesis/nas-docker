@@ -37,6 +37,14 @@ about to run out of battery.
 
 ## 1. Deploy the NUT server stack (server03, via Portainer)
 
+**Prerequisite (one-time, on server03):** the stack bind-mounts the GXT5 driver
+definition from the host. Place it first:
+
+```bash
+sudo mkdir -p /opt/containers/nut
+sudo cp nut/local/ups.conf /opt/containers/nut/ups.conf
+```
+
 Portainer → **Stacks → Add stack → Git repository**:
 
 | Field | Value |
@@ -57,14 +65,15 @@ correctly in seconds, ~49 min at full charge.) If you get `Driver not connected`
 confirm `lsusb` shows `10af:1000` and the container has the USB device
 (`devices: /dev/bus/usb`).
 
-> **Why the inline `ups_conf` config exists:** the GXT5 (`10af:1000`) isn't
+> **Why `/opt/containers/nut/ups.conf` exists:** the GXT5 (`10af:1000`) isn't
 > auto-claimed by `usbhid-ups` — it must be forced with an explicit `productid = 1000`,
-> which this image's env-only config can't express. So the driver section is supplied as
-> an inline Compose `config` mounted at `/etc/nut/local/ups.conf` (the image copies it
-> to `/etc/nut/ups.conf` on startup). It's inlined rather than a bind mount so the stack
-> is self-contained and Portainer's git deploy can't turn the mount source into a
-> directory. Shutdown triggers on the UPS's own `LB` low-battery flag regardless of the
-> runtime number.
+> which this image's env-only config can't express. The driver section is therefore
+> bind-mounted from a pre-created host file to `/etc/nut/local/ups.conf` (the image
+> copies it to `/etc/nut/ups.conf` on startup). A pre-created absolute-path file is used
+> because Portainer doesn't render inline compose `configs`, a missing bind source gets
+> created as a directory, and a read-only *directory* mount makes the image abort.
+> Shutdown triggers on the UPS's own `LB` low-battery flag regardless of the runtime
+> number.
 
 > Passwords stay out of git: `NUT_PASSWORD` is set in the Portainer stack environment
 > (or a local, git-ignored `nut/.env` — see `.env.example`). The image can also read a
@@ -124,7 +133,8 @@ machines stay off until mains is restored. Set each machine's BIOS/UEFI to
 
 | Path | Purpose |
 |------|---------|
-| `docker-compose.yml` | NUT server stack (driver + upsd) for Portainer; GXT5 driver def is an inline config |
+| `docker-compose.yml` | NUT server stack (driver + upsd) for Portainer |
+| `local/ups.conf` | GXT5 driver def; copy to `/opt/containers/nut/ups.conf` on server03 |
 | `.env.example` | template for `NUT_PASSWORD` |
 | `host/server03/install.sh` | native upsmon (primary) installer |
 | `host/server03/nut-shutdown.sh` | primary SHUTDOWNCMD (UDM poweroff + halt) |
