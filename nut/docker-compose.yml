@@ -1,0 +1,31 @@
+services:
+  nut-upsd:
+    image: instantlinux/nut-upsd:latest
+    container_name: nut-upsd
+    restart: always
+    environment:
+      # The UPS / driver definition lives in ./local/ups.conf (mounted below), because
+      # the GXT5 needs an explicit productid that this image's env config can't set.
+      # NAME must match the [section] in that file so the built-in upsmon monitors it.
+      NAME: gxt5
+      MAXAGE: "15"
+      # --- monitor account used by every upsmon (this container + the hosts) ---
+      API_USER: upsmon
+      # Set NUT_PASSWORD in the Portainer stack's Environment variables (or a local .env).
+      API_PASSWORD: ${NUT_PASSWORD:?set NUT_PASSWORD in the stack environment}
+    volumes:
+      # Mount the single file (not the dir): the image chgrp's /etc/nut/* on startup,
+      # which fails on a read-only mounted directory and aborts the container.
+      - ./local/ups.conf:/etc/nut/local/ups.conf:ro
+    devices:
+      # Whole USB bus: survives device renumbering across reboots.
+      - /dev/bus/usb:/dev/bus/usb
+    device_cgroup_rules:
+      - "c 189:* rwm"                # allow any USB char device (major 189)
+    ports:
+      - "3493:3493"                  # upsd, reachable by remote NUT clients
+    logging:
+      driver: json-file
+      options:
+        max-size: "10mb"
+        max-file: "1"
