@@ -32,3 +32,25 @@ services:
       options:
         max-size: "10mb"
         max-file: "1"
+
+  # Web dashboard for NUT. Reaches upsd by container name on the shared stack network.
+  # Connection is pre-seeded in /opt/containers/peanut/settings.yml (NUT_SERVERS -> nut-upsd:3493).
+  peanut:
+    image: brandawg93/peanut:latest
+    container_name: peanut
+    restart: always
+    depends_on:
+      - nut-upsd
+    environment:
+      WEB_USERNAME: admin
+      # Set PEANUT_WEB_PASSWORD in the Portainer stack's Environment variables.
+      WEB_PASSWORD: ${PEANUT_WEB_PASSWORD:?set PEANUT_WEB_PASSWORD in the stack environment}
+    volumes:
+      - /opt/containers/peanut:/config   # must be writable by uid/gid 1000
+    ports:
+      - "8080:8080"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10mb"
+        max-file: "1"

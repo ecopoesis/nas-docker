@@ -51,7 +51,18 @@ Portainer → **Stacks → Add stack → Git repository**:
 |-------|-------|
 | Repository URL | `https://github.com/ecopoesis/nas-docker` |
 | Compose path | `nut/docker-compose.yml` |
-| Environment variables | add `NUT_PASSWORD` = a strong password |
+| Environment variables | `NUT_PASSWORD` (strong password) and `PEANUT_WEB_PASSWORD` (dashboard login) |
+
+The stack includes **PeaNUT**, a web dashboard at `http://192.168.1.4:8080` (login
+`admin` / `PEANUT_WEB_PASSWORD`). It reaches upsd by container name; its NUT connection
+is pre-seeded in `/opt/containers/peanut/settings.yml`. That dir must exist and be owned
+by uid/gid 1000 before deploy:
+
+```bash
+sudo mkdir -p /opt/containers/peanut && sudo chown 1000:1000 /opt/containers/peanut
+# then create settings.yml pointing NUT_SERVERS at HOST nut-upsd, PORT 3493,
+# USERNAME upsmon, PASSWORD <NUT_PASSWORD>  (see repo history / wiki for the format)
+```
 
 Deploy. Then verify the UPS is being read (from server03):
 
