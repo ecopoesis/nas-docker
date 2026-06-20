@@ -18,7 +18,7 @@
 
 set -euo pipefail
 
-: "${NUT_PASSWORD:?Set NUT_PASSWORD (must match the stack's NUT_PASSWORD)}"
+: "${NUT_PASSWORD:?Set NUT_PASSWORD to match the value set in the Portainer stack}"
 UPSD_HOST="${UPSD_HOST:-127.0.0.1}"
 UDM_HOST="${UDM_HOST:-192.168.1.1}"
 
