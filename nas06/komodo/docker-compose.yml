@@ -1,0 +1,77 @@
+# Komodo: container manager for nas06 (and later server03).
+# Core (web UI/API, :9120) + MongoDB + Periphery (the agent that runs stacks on this host).
+#
+# Based on upstream compose/mongo.compose.yaml (Komodo v2). Differences:
+#   - images pinned, so Renovate can propose updates as PRs
+#   - state in bind mounts under ${CONFIG_ROOT}, not named volumes, so it is
+#     snapshotted/replicated with the rest of the config and moves with it
+#   - secrets come from one env file kept on the host, never in git
+#     (template: komodo.env.example); non-secret settings are inline below
+#
+# This stack is the bootstrap, so Komodo does not manage it: it runs as a
+# TrueNAS custom app. See README.md.
+
+services:
+  mongo:
+    image: mongo:8.0.38
+    labels:
+      komodo.skip: # keep Komodo's StopAllContainers from stopping its own DB
+    command: --quiet --wiredTigerCacheSizeGB 0.25
+    restart: unless-stopped
+    env_file: ${CONFIG_ROOT:-/mnt/tank/config}/komodo/komodo.env
+    volumes:
+      - ${CONFIG_ROOT:-/mnt/tank/config}/komodo/mongo/db:/data/db
+      - ${CONFIG_ROOT:-/mnt/tank/config}/komodo/mongo/configdb:/data/configdb
+
+  core:
+    image: ghcr.io/moghtech/komodo-core:2.3.4
+    labels:
+      komodo.skip:
+    init: true
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    ports:
+      - 9120:9120
+    env_file: ${CONFIG_ROOT:-/mnt/tank/config}/komodo/komodo.env
+    environment:
+      TZ: Etc/UTC
+      KOMODO_DATABASE_ADDRESS: mongo:27017
+      KOMODO_HOST: http://192.168.1.5:9120
+      KOMODO_TITLE: Komodo
+      KOMODO_PERIPHERY_PUBLIC_KEY: file:/config/keys/periphery.pub
+      KOMODO_LOCAL_AUTH: "true"
+      KOMODO_INIT_ADMIN_USERNAME: admin
+      KOMODO_FIRST_SERVER_NAME: nas06
+      KOMODO_DISABLE_USER_REGISTRATION: "true"
+      KOMODO_ENABLE_NEW_USERS: "false"
+      KOMODO_JWT_TTL: 1-day
+      KOMODO_MONITORING_INTERVAL: 15-sec
+      KOMODO_RESOURCE_POLL_INTERVAL: 1-hr
+    volumes:
+      - ${CONFIG_ROOT:-/mnt/tank/config}/komodo/keys:/config/keys
+      - ${CONFIG_ROOT:-/mnt/tank/config}/komodo/backups:/backups
+
+  periphery:
+    image: ghcr.io/moghtech/komodo-periphery:2.3.4
+    labels:
+      komodo.skip:
+    init: true
+    restart: unless-stopped
+    depends_on:
+      - core
+    # No env_file: Periphery needs none of the secrets.
+    environment:
+      TZ: Etc/UTC
+      PERIPHERY_CORE_ADDRESS: ws://core:9120
+      PERIPHERY_CONNECT_AS: nas06
+      PERIPHERY_CORE_PUBLIC_KEYS: file:/config/keys/core.pub
+      # Stacks/repos are cloned under here. Must be the same path inside and
+      # outside the container, or bind mounts in deployed stacks break.
+      PERIPHERY_ROOT_DIRECTORY: ${CONFIG_ROOT:-/mnt/tank/config}/komodo/periphery
+      PERIPHERY_INCLUDE_DISK_MOUNTS: /etc/hostname
+    volumes:
+      - ${CONFIG_ROOT:-/mnt/tank/config}/komodo/keys:/config/keys
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /proc:/proc
+      - ${CONFIG_ROOT:-/mnt/tank/config}/komodo/periphery:${CONFIG_ROOT:-/mnt/tank/config}/komodo/periphery

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "docker:pinDigests"],
+  "includePaths": ["nas06/**"],
+  "dependencyDashboard": true,
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
+  "prHourlyLimit": 0,
+  "packageRules": [
+    {
+      "description": "Stay on the MongoDB 8.0 line (8.1/8.3 are short-lived rapid releases)",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["mongo"],
+      "allowedVersions": "<8.1"
+    },
+    {
+      "description": "Update Komodo core and periphery together",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/moghtech/komodo-core", "ghcr.io/moghtech/komodo-periphery"],
+      "groupName": "komodo"
+    }
+  ]
+}
