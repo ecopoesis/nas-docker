@@ -4,7 +4,7 @@
 
 services:
   resilio:
-    image: resilio/sync:2.8.1
+    image: resilio/sync:2.8.1@sha256:c5dbffd432c0621414e3c8daa66d453553c4bf80f6727b91fbff4b3ec08a87b5
     container_name: resilio
     user: "568:568"   # TrueNAS "apps" user (was 500:1000 on the QNAP)
     restart: unless-stopped

@@ -3,7 +3,7 @@
 
 services:
   jellyfin:
-    image: jellyfin/jellyfin:12.4
+    image: jellyfin/jellyfin:12.4@sha256:fea863d0cd9ec445985d9c75fc6ed64e38a1d2766cf0c250a33d553f4fc1b771
     container_name: jellyfin
     user: "568:568"   # TrueNAS "apps" user
     restart: unless-stopped
