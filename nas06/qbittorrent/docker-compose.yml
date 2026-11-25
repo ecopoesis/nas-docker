@@ -1,0 +1,22 @@
+# qBittorrent for occasional manual torrents (not wired into Sonarr/Radarr).
+# Web UI on :8090. On first start the linuxserver image prints a temporary admin
+# password in the container log; change it in Settings > Web UI.
+
+services:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:5.3.1_v2.1.3-ls490
+    container_name: qbittorrent
+    restart: unless-stopped
+    environment:
+      PUID: "568"
+      PGID: "568"
+      TZ: Etc/UTC
+      WEBUI_PORT: "8090"
+      TORRENTING_PORT: "6881"
+    ports:
+      - 8090:8090
+      - 6881:6881
+      - 6881:6881/udp
+    volumes:
+      - ${CONFIG_ROOT:-/mnt/tank/config}/qbittorrent:/config
+      - ${MEDIA_ROOT:-/mnt/tank/media}/downloads/torrents:/downloads

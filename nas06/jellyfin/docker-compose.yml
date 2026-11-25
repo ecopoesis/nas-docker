@@ -1,0 +1,19 @@
+# Jellyfin, running alongside Plex on the same library (both read-only).
+# Uses the same /data path as Plex, so library folders look identical in both.
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:12.4
+    container_name: jellyfin
+    user: "568:568"   # TrueNAS "apps" user
+    restart: unless-stopped
+    ports:
+      - 8096:8096
+      - 7359:7359/udp   # client auto-discovery on the LAN
+    environment:
+      TZ: Etc/UTC
+      JELLYFIN_PublishedServerUrl: http://192.168.1.5:8096
+    volumes:
+      - ${CONFIG_ROOT:-/mnt/tank/config}/jellyfin/config:/config
+      - ${CONFIG_ROOT:-/mnt/tank/config}/jellyfin/cache:/cache
+      - ${MEDIA_ROOT:-/mnt/tank/media}:/data:ro

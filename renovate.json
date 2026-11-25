@@ -14,6 +14,18 @@
       "allowedVersions": "<8.1"
     },
     {
+      "description": "linuxserver.io tags: <version>[.<build>][-<extra>]-ls<rebuild>; stable channel only",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["/^lscr\\.io\\/linuxserver\\//"],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:\\.(?<build>\\d+))?(?:[-_][0-9a-z.]+?)?-ls(?<revision>\\d+)$"
+    },
+    {
+      "description": "Major app upgrades (e.g. Sonarr 4 -> 5) need a human: never group or rush them",
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    },
+    {
       "description": "Update Komodo core and periphery together",
       "matchDatasources": ["docker"],
       "matchPackageNames": ["ghcr.io/moghtech/komodo-core", "ghcr.io/moghtech/komodo-periphery"],

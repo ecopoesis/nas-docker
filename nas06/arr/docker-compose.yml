@@ -1,0 +1,59 @@
+# Usenet automation: SABnzbd (downloader), Sonarr (TV), Radarr (movies), Prowlarr (indexers).
+# Migrated from the QNAP "high-seas" stack. Container paths (/tv, /movies, /downloads,
+# /incomplete-downloads) are unchanged so the migrated app databases keep working.
+# Host ports match the QNAP's, except Prowlarr, which is new.
+#
+# Apps reach each other by service name on this stack's network, e.g. http://sabnzbd:8080.
+
+x-common: &common
+  restart: unless-stopped
+  environment:
+    PUID: "568"   # TrueNAS "apps" user
+    PGID: "568"
+    TZ: Etc/UTC
+
+services:
+  sabnzbd:
+    <<: *common
+    image: lscr.io/linuxserver/sabnzbd:5.1.3-ls282
+    container_name: sabnzbd
+    ports:
+      - 10000:8080
+    volumes:
+      - ${CONFIG_ROOT:-/mnt/tank/config}/sabnzbd:/config
+      - ${MEDIA_ROOT:-/mnt/tank/media}/downloads/complete:/downloads
+      - ${MEDIA_ROOT:-/mnt/tank/media}/downloads/incomplete:/incomplete-downloads
+
+  sonarr:
+    <<: *common
+    image: lscr.io/linuxserver/sonarr:4.0.20.3014-ls6
+    container_name: sonarr
+    ports:
+      - 10004:8989
+    volumes:
+      - ${CONFIG_ROOT:-/mnt/tank/config}/sonarr:/config
+      - ${MEDIA_ROOT:-/mnt/tank/media}/downloads/complete:/downloads
+      - ${MEDIA_ROOT:-/mnt/tank/media}/downloads/incomplete:/incomplete-downloads
+      - ${MEDIA_ROOT:-/mnt/tank/media}/tv:/tv
+
+  radarr:
+    <<: *common
+    image: lscr.io/linuxserver/radarr:7.0.3.10918-ls328
+    container_name: radarr
+    ports:
+      - 10002:7878
+    volumes:
+      - ${CONFIG_ROOT:-/mnt/tank/config}/radarr:/config
+      - ${MEDIA_ROOT:-/mnt/tank/media}/downloads/complete:/downloads
+      - ${MEDIA_ROOT:-/mnt/tank/media}/downloads/incomplete:/incomplete-downloads
+      - ${MEDIA_ROOT:-/mnt/tank/media}/downloads/resilio:/downloads-resilio
+      - ${MEDIA_ROOT:-/mnt/tank/media}/movies:/movies
+
+  prowlarr:
+    <<: *common
+    image: lscr.io/linuxserver/prowlarr:3.1.0.5799-ls170
+    container_name: prowlarr
+    ports:
+      - 9696:9696
+    volumes:
+      - ${CONFIG_ROOT:-/mnt/tank/config}/prowlarr:/config

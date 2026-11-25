@@ -1,0 +1,19 @@
+# Resilio Sync. Same container paths as on the QNAP, so the migrated config's
+# folder entries still resolve. Synced files land in media/downloads/resilio,
+# which Radarr also reads.
+
+services:
+  resilio:
+    image: resilio/sync:2.8.1
+    container_name: resilio
+    user: "568:568"   # TrueNAS "apps" user (was 500:1000 on the QNAP)
+    restart: unless-stopped
+    environment:
+      TZ: Etc/UTC
+    ports:
+      - 10006:8888
+      - 55555:55555
+      - 55555:55555/udp
+    volumes:
+      - ${CONFIG_ROOT:-/mnt/tank/config}/resilio:/mnt/sync
+      - ${MEDIA_ROOT:-/mnt/tank/media}/downloads/resilio:/mnt/mounted_folders/downloads

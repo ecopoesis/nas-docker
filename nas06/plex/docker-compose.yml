@@ -1,0 +1,20 @@
+# Plex Media Server. Direct play only: nas06 has no GPU, so any transcoding is CPU-only.
+# /data is the media root, the same container path the QNAP used, so library paths
+# in the migrated database still resolve. Media is read-only to Plex.
+
+services:
+  plex:
+    image: lscr.io/linuxserver/plex:1.43.5.11079-b3b13e506-ls334
+    container_name: plex
+    network_mode: host   # 32400 plus local discovery (GDM)
+    restart: unless-stopped
+    environment:
+      PUID: "568"
+      PGID: "568"
+      TZ: Etc/UTC
+      VERSION: docker
+    volumes:
+      - ${CONFIG_ROOT:-/mnt/tank/config}/plex:/config
+      - ${MEDIA_ROOT:-/mnt/tank/media}:/data:ro
+    tmpfs:
+      - /transcode:size=8g   # rare CPU transcodes go to RAM, not the pool
